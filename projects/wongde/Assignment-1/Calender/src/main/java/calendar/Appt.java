@@ -145,8 +145,8 @@ public class Appt{
                 String emailAddress) {
                     
          //Just call the other constructor
-         this(NO_TIME, NO_TIME, startDay, startMonth, startYear, title, 
-            description, emailAddress);
+         this(NO_TIME, NO_TIME, startDay, startMonth, startYear, description, 
+             title, emailAddress);
          this.valid=true;
     }
 
@@ -176,7 +176,7 @@ public class Appt{
 		else if (startYear <= 0)
 			this.valid = false;
 		else {
-			int NumDaysInMonth = CalendarUtil.NumDaysInMonth(startYear, startMonth - 1);
+			int NumDaysInMonth = CalendarUtil.NumDaysInMonth(startYear, startMonth);
 			if (startDay < 1 || startDay > NumDaysInMonth)
 				this.valid = false;
 			else
@@ -304,7 +304,7 @@ public class Appt{
     }
     private void setRecurDays(int[] recurDays) {
         if (recurDays == null) {
-            this.recurDays = new int[0];
+            this.recurDays = new int[1];
         }
         else {
             this.recurDays = recurDays;
