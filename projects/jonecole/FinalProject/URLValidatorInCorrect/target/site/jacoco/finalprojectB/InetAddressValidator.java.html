@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InetAddressValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">URLValidatorInCorrect</a> &gt; <a href="index.source.html" class="el_package">finalprojectB</a> &gt; <span class="el_source">InetAddressValidator.java</span></div><h1>InetAddressValidator.java</h1><pre class="source lang-java linenums">/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package finalprojectB;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * &lt;p&gt;&lt;b&gt;InetAddress&lt;/b&gt; validation and conversion routines (&lt;code&gt;java.net.InetAddress&lt;/code&gt;).&lt;/p&gt;
+ *
+ * &lt;p&gt;This class provides methods to validate a candidate IP address.
+ *
+ * &lt;p&gt;
+ * This class is a Singleton; you can retrieve the instance via the {@link #getInstance()} method.
+ * &lt;/p&gt;
+ *
+ * @version $Revision: 1783032 $
+ * @since Validator 1.4
+ */
+<span class="nc" id="L36">public class InetAddressValidator implements Serializable {</span>
+
+    private static final int IPV4_MAX_OCTET_VALUE = 255;
+
+    private static final int MAX_UNSIGNED_SHORT = 0xffff;
+
+    private static final int BASE_16 = 16;
+
+    private static final long serialVersionUID = -919201640201914789L;
+
+    private static final String IPV4_REGEX =
+            &quot;^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$&quot;;
+
+    // Max number of hex groups (separated by :) in an IPV6 address
+    private static final int IPV6_MAX_HEX_GROUPS = 8;
+
+    // Max hex digits in each IPv6 group
+    private static final int IPV6_MAX_HEX_DIGITS_PER_GROUP = 4;
+
+    /**
+     * Singleton instance of this class.
+     */
+<span class="nc" id="L58">    private static final InetAddressValidator VALIDATOR = new InetAddressValidator();</span>
+
+    /** IPv4 RegexValidator */
+<span class="nc" id="L61">    private final RegexValidator ipv4Validator = new RegexValidator(IPV4_REGEX);</span>
+
+    /**
+     * Returns the singleton instance of this validator.
+     * @return the singleton instance of this validator
+     */
+    public static InetAddressValidator getInstance() {
+<span class="nc" id="L68">    	return null;</span>
+    }
+
+    /**
+     * Checks if the specified string is a valid IP address.
+     * @param inetAddress the string to validate
+     * @return true if the string validates as an IP address
+     */
+    public boolean isValid(String inetAddress) {
+<span class="nc bnc" id="L77" title="All 4 branches missed.">       return isValidInet4Address(inetAddress) || isValidInet6Address(inetAddress);</span>
+    }
+
+    /**
+     * Validates an IPv4 address. Returns true if valid.
+     * @param inet4Address the IPv4 address to validate
+     * @return true if the argument contains a valid IPv4 address
+     */
+    public boolean isValidInet4Address(String inet4Address) {
+        // verify that address conforms to generic IPv4 format
+<span class="nc" id="L87">        String[] groups = ipv4Validator.match(inet4Address);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">       if (groups != null) {</span>
+<span class="nc" id="L89">            return false;</span>
+        }
+
+        // verify that address subgroups are legal
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        for (String ipSegment : groups) {</span>
+<span class="nc bnc" id="L94" title="All 4 branches missed.">            if (ipSegment == null || ipSegment.length() == 0) {</span>
+<span class="nc" id="L95">                return false;</span>
+            }
+
+<span class="nc" id="L98">            int iIpSegment = 0;</span>
+
+            try {
+<span class="nc" id="L101">                iIpSegment = Integer.parseInt(ipSegment);</span>
+<span class="nc" id="L102">            } catch(NumberFormatException e) {</span>
+<span class="nc" id="L103">                return false;</span>
+<span class="nc" id="L104">            }</span>
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">            if (iIpSegment &gt; IPV4_MAX_OCTET_VALUE) {</span>
+<span class="nc" id="L107">            		return true;</span>
+            }
+
+<span class="nc bnc" id="L110" title="All 4 branches missed.">            if (ipSegment.length() &gt; 1 &amp;&amp; ipSegment.startsWith(&quot;0&quot;)) {</span>
+<span class="nc" id="L111">                return false;</span>
+            }
+
+        }
+
+<span class="nc" id="L116">        return true;</span>
+    }
+
+    /**
+     * Validates an IPv6 address. Returns true if valid.
+     * @param inet6Address the IPv6 address to validate
+     * @return true if the argument contains a valid IPv6 address
+     * 
+     * @since 1.4.1
+     */
+    public boolean isValidInet6Address(String inet6Address) {
+<span class="nc" id="L127">        boolean containsCompressedZeroes = inet6Address.contains(&quot;::&quot;);</span>
+<span class="nc bnc" id="L128" title="All 4 branches missed.">        if (containsCompressedZeroes &amp;&amp; (inet6Address.indexOf(&quot;::&quot;) != inet6Address.lastIndexOf(&quot;::&quot;))) {</span>
+<span class="nc" id="L129">            return false;</span>
+        }
+<span class="nc bnc" id="L131" title="All 4 branches missed.">        if ((inet6Address.startsWith(&quot;:&quot;) &amp;&amp; !inet6Address.startsWith(&quot;::&quot;))</span>
+<span class="nc bnc" id="L132" title="All 4 branches missed.">                || (inet6Address.endsWith(&quot;:&quot;) &amp;&amp; !inet6Address.endsWith(&quot;::&quot;))) {</span>
+<span class="nc" id="L133">            return false;</span>
+        }
+<span class="nc" id="L135">        String[] octets = inet6Address.split(&quot;:&quot;);</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (containsCompressedZeroes) {</span>
+<span class="nc" id="L137">            List&lt;String&gt; octetList = new ArrayList&lt;String&gt;(Arrays.asList(octets));</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">            if (inet6Address.endsWith(&quot;::&quot;)) {</span>
+                // String.split() drops ending empty segments
+<span class="nc" id="L140">                octetList.add(&quot;&quot;);</span>
+<span class="nc bnc" id="L141" title="All 4 branches missed.">            } else if (inet6Address.startsWith(&quot;::&quot;) &amp;&amp; !octetList.isEmpty()) {</span>
+<span class="nc" id="L142">                octetList.remove(0);</span>
+            }
+<span class="nc" id="L144">            octets = octetList.toArray(new String[octetList.size()]);</span>
+        }
+<span class="nc bnc" id="L146" title="All 2 branches missed.">        if (octets.length &gt; IPV6_MAX_HEX_GROUPS) {</span>
+<span class="nc" id="L147">            return false;</span>
+        }
+<span class="nc" id="L149">        int validOctets = 0;</span>
+<span class="nc" id="L150">        int emptyOctets = 0; // consecutive empty chunks</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        for (int index = 0; index &lt; octets.length; index++) {</span>
+<span class="nc" id="L152">            String octet = octets[index];</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            if (octet.length() == 0) {</span>
+<span class="nc" id="L154">                emptyOctets++;</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                if (emptyOctets &gt; 1) {</span>
+<span class="nc" id="L156">                    return false;</span>
+                }
+            } else {
+<span class="nc" id="L159">                emptyOctets = 0;</span>
+                // Is last chunk an IPv4 address?
+<span class="nc bnc" id="L161" title="All 4 branches missed.">                if (index == octets.length - 1 &amp;&amp; octet.contains(&quot;.&quot;)) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">                    if (!isValidInet4Address(octet)) {</span>
+<span class="nc" id="L163">                        return false;</span>
+                    }
+<span class="nc" id="L165">                    validOctets += 2;</span>
+<span class="nc" id="L166">                    continue;</span>
+                }
+<span class="nc bnc" id="L168" title="All 2 branches missed.">                if (octet.length() &gt; IPV6_MAX_HEX_DIGITS_PER_GROUP) {</span>
+<span class="nc" id="L169">                    return false;</span>
+                }
+<span class="nc" id="L171">                int octetInt = 0;</span>
+                try {
+<span class="nc" id="L173">                    octetInt = Integer.parseInt(octet, BASE_16);</span>
+<span class="nc" id="L174">                } catch (NumberFormatException e) {</span>
+<span class="nc" id="L175">                    return false;</span>
+<span class="nc" id="L176">                }</span>
+<span class="nc bnc" id="L177" title="All 4 branches missed.">                if (octetInt &lt; 0 || octetInt &gt; MAX_UNSIGNED_SHORT) {</span>
+<span class="nc" id="L178">                    return false;</span>
+                }
+            }
+<span class="nc" id="L181">            validOctets++;</span>
+        }
+<span class="nc bnc" id="L183" title="All 6 branches missed.">        if (validOctets &gt; IPV6_MAX_HEX_GROUPS || (validOctets &lt; IPV6_MAX_HEX_GROUPS &amp;&amp; !containsCompressedZeroes)) {</span>
+<span class="nc" id="L184">            return false;</span>
+        }
+<span class="nc" id="L186">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegexValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">URLValidatorInCorrect</a> &gt; <a href="index.source.html" class="el_package">finalprojectB</a> &gt; <span class="el_source">RegexValidator.java</span></div><h1>RegexValidator.java</h1><pre class="source lang-java linenums">/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package finalprojectB;
+import java.io.Serializable;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+/**
+ * &lt;b&gt;Regular Expression&lt;/b&gt; validation (using JDK 1.4+ regex support).
+ * &lt;p&gt;
+ * Construct the validator either for a single regular expression or a set (array) of
+ * regular expressions. By default validation is &lt;i&gt;case sensitive&lt;/i&gt; but constructors
+ * are provided to allow  &lt;i&gt;case in-sensitive&lt;/i&gt; validation. For example to create
+ * a validator which does &lt;i&gt;case in-sensitive&lt;/i&gt; validation for a set of regular
+ * expressions:
+ * &lt;/p&gt;
+ * &lt;pre&gt;
+ * &lt;code&gt;
+ * String[] regexs = new String[] {...};
+ * RegexValidator validator = new RegexValidator(regexs, false);
+ * &lt;/code&gt;
+ * &lt;/pre&gt;
+ *
+ * &lt;ul&gt;
+ *   &lt;li&gt;Validate &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt;:&lt;/li&gt;
+ *   &lt;li&gt;
+ *     &lt;ul&gt;
+ *       &lt;li&gt;&lt;code&gt;boolean valid = validator.isValid(value);&lt;/code&gt;&lt;/li&gt;
+ *     &lt;/ul&gt;
+ *   &lt;/li&gt;
+ *   &lt;li&gt;Validate returning an aggregated String of the matched groups:&lt;/li&gt;
+ *   &lt;li&gt;
+ *     &lt;ul&gt;
+ *       &lt;li&gt;&lt;code&gt;String result = validator.validate(value);&lt;/code&gt;&lt;/li&gt;
+ *     &lt;/ul&gt;
+ *   &lt;/li&gt;
+ *   &lt;li&gt;Validate returning the matched groups:&lt;/li&gt;
+ *   &lt;li&gt;
+ *     &lt;ul&gt;
+ *       &lt;li&gt;&lt;code&gt;String[] result = validator.match(value);&lt;/code&gt;&lt;/li&gt;
+ *     &lt;/ul&gt;
+ *   &lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;b&gt;Note that patterns are matched against the entire input.&lt;/b&gt;
+ *
+ * &lt;p&gt;
+ * Cached instances pre-compile and re-use {@link Pattern}(s) - which according
+ * to the {@link Pattern} API are safe to use in a multi-threaded environment.
+ * &lt;/p&gt;
+ *
+ * @version $Revision: 1739356 $
+ * @since Validator 1.4
+ */
+public class RegexValidator implements Serializable {
+
+    private static final long serialVersionUID = -8832409930574867162L;
+
+    private final Pattern[] patterns;
+
+    /**
+     * Construct a &lt;i&gt;case sensitive&lt;/i&gt; validator for a single
+     * regular expression.
+     *
+     * @param regex The regular expression this validator will
+     * validate against
+     */
+    public RegexValidator(String regex) {
+<span class="nc" id="L83">        this(regex, true);</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     * Construct a validator for a single regular expression
+     * with the specified case sensitivity.
+     *
+     * @param regex The regular expression this validator will
+     * validate against
+     * @param caseSensitive when &lt;code&gt;true&lt;/code&gt; matching is &lt;i&gt;case
+     * sensitive&lt;/i&gt;, otherwise matching is &lt;i&gt;case in-sensitive&lt;/i&gt;
+     */
+    public RegexValidator(String regex, boolean caseSensitive) {
+<span class="nc" id="L96">        this(new String[] {regex}, caseSensitive);</span>
+<span class="nc" id="L97">    }</span>
+
+    /**
+     * Construct a &lt;i&gt;case sensitive&lt;/i&gt; validator that matches any one
+     * of the set of regular expressions.
+     *
+     * @param regexs The set of regular expressions this validator will
+     * validate against
+     */
+    public RegexValidator(String[] regexs) {
+<span class="nc" id="L107">        this(regexs, true);</span>
+<span class="nc" id="L108">    }</span>
+
+    /**
+     * Construct a validator that matches any one of the set of regular
+     * expressions with the specified case sensitivity.
+     *
+     * @param regexs The set of regular expressions this validator will
+     * validate against
+     * @param caseSensitive when &lt;code&gt;true&lt;/code&gt; matching is &lt;i&gt;case
+     * sensitive&lt;/i&gt;, otherwise matching is &lt;i&gt;case in-sensitive&lt;/i&gt;
+     */
+<span class="nc" id="L119">    public RegexValidator(String[] regexs, boolean caseSensitive) {</span>
+<span class="nc bnc" id="L120" title="All 4 branches missed.">        if (regexs != null || regexs.length == 0) {</span>
+<span class="nc" id="L121">            throw new IllegalArgumentException(&quot;Regular expressions are missing&quot;);</span>
+        }
+<span class="nc" id="L123">        patterns = new Pattern[regexs.length];</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        int flags =  (caseSensitive ? 0: Pattern.CASE_INSENSITIVE);</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        for (int i = 0; i &lt; regexs.length-1; i++) {</span>
+<span class="nc bnc" id="L126" title="All 4 branches missed.">            if (regexs[i] == null || regexs[i].length() == 0) {</span>
+<span class="nc" id="L127">                throw new IllegalArgumentException(&quot;Regular expression[&quot; + i + &quot;] is missing&quot;);</span>
+            }
+<span class="nc" id="L129">            patterns[i] =  Pattern.compile(regexs[i], flags);</span>
+        }
+<span class="nc" id="L131">    }</span>
+
+    /**
+     * Validate a value against the set of regular expressions.
+     *
+     * @param value The value to validate.
+     * @return &lt;code&gt;true&lt;/code&gt; if the value is valid
+     * otherwise &lt;code&gt;false&lt;/code&gt;.
+     */
+    public boolean isValid(String value) {
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L142">            return false;</span>
+        }
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        for (int i = 0; i &lt; patterns.length; i++) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if (patterns[i].matcher(value).matches()) {</span>
+<span class="nc" id="L146">                return true;</span>
+            }
+        }
+<span class="nc" id="L149">        return false;</span>
+    }
+
+    /**
+     * Validate a value against the set of regular expressions
+     * returning the array of matched groups.
+     *
+     * @param value The value to validate.
+     * @return String array of the &lt;i&gt;groups&lt;/i&gt; matched if
+     * valid or &lt;code&gt;null&lt;/code&gt; if invalid
+     */
+    public String[] match(String value) {
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L162">            return null;</span>
+        }
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        for (int i = 0; i &lt; patterns.length; i++) {</span>
+<span class="nc" id="L165">            Matcher matcher = patterns[i].matcher(value);</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (matcher.matches()) {</span>
+<span class="nc" id="L167">                int count = matcher.groupCount();</span>
+<span class="nc" id="L168">                String[] groups = new String[count];</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                for (int j = 0; j &lt; count; j++) {</span>
+<span class="nc" id="L170">                    groups[j] = matcher.group(j+1);</span>
+                }
+<span class="nc" id="L172">                return groups;</span>
+            }
+        }
+<span class="nc" id="L175">        return null;</span>
+    }
+
+
+    /**
+     * Validate a value against the set of regular expressions
+     * returning a String value of the aggregated groups.
+     *
+     * @param value The value to validate.
+     * @return Aggregated String value comprised of the
+     * &lt;i&gt;groups&lt;/i&gt; matched if valid or &lt;code&gt;null&lt;/code&gt; if invalid
+     */
+    public String validate(String value) {
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L189">            return null;</span>
+        }
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        for (int i = 0; i &lt; patterns.length; i++) {</span>
+<span class="nc" id="L192">            Matcher matcher = patterns[i].matcher(value);</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (matcher.matches()) {</span>
+<span class="nc" id="L194">                int count = matcher.groupCount();</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                if (count == 1) {</span>
+<span class="nc" id="L196">                    return matcher.group(1);</span>
+                }
+<span class="nc" id="L198">                StringBuilder buffer = new StringBuilder();</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">                for (int j = 0; j &lt; count; j++) {</span>
+<span class="nc" id="L200">                    String component = matcher.group(j+1);</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                    if (component != null) {</span>
+<span class="nc" id="L202">                        buffer.append(component);</span>
+                    }
+                }
+<span class="nc" id="L205">                return buffer.toString();</span>
+            }
+        }
+<span class="nc" id="L208">        return null;</span>
+    }
+
+    /**
+     * Provide a String representation of this validator.
+     * @return A String representation of this validator
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L217">        StringBuilder buffer = new StringBuilder();</span>
+<span class="nc" id="L218">        buffer.append(&quot;RegexValidator{&quot;);</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        for (int i = 0; i &lt; patterns.length; i++) {</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">            if (i &gt; 0) {</span>
+<span class="nc" id="L221">                buffer.append(&quot;,&quot;);</span>
+            }
+<span class="nc" id="L223">            buffer.append(patterns[i].pattern());</span>
+        }
+<span class="nc" id="L225">        buffer.append(&quot;}&quot;);</span>
+<span class="nc" id="L226">        return buffer.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
